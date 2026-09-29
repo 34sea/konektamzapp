@@ -1,0 +1,261 @@
+package com.example.konekta_mz_app.ui.navigation
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Work
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.konekta_mz_app.KonektaApp
+import com.example.konekta_mz_app.data.local.entity.UserRole
+import com.example.konekta_mz_app.ui.screens.admin.AdminScreen
+import com.example.konekta_mz_app.ui.screens.applications.ApplicationsScreen
+import com.example.konekta_mz_app.ui.screens.auth.LoginScreen
+import com.example.konekta_mz_app.ui.screens.auth.RegisterScreen
+import com.example.konekta_mz_app.ui.screens.home.HomeScreen
+import com.example.konekta_mz_app.ui.screens.job.CreateJobScreen
+import com.example.konekta_mz_app.ui.screens.job.JobDetailScreen
+import com.example.konekta_mz_app.ui.screens.map.MapScreen
+import com.example.konekta_mz_app.ui.screens.profile.ProfileScreen
+import com.example.konekta_mz_app.viewmodel.AdminViewModel
+import com.example.konekta_mz_app.viewmodel.ApplicationsViewModel
+import com.example.konekta_mz_app.viewmodel.AuthViewModel
+import com.example.konekta_mz_app.viewmodel.HomeViewModel
+import com.example.konekta_mz_app.viewmodel.JobViewModel
+import com.example.konekta_mz_app.viewmodel.MapViewModel
+import com.example.konekta_mz_app.viewmodel.ProfileViewModel
+
+sealed class Screen(val route: String) {
+    object Login : Screen("login")
+    object Register : Screen("register")
+    object Home : Screen("home")
+    object Map : Screen("map")
+    object Profile : Screen("profile")
+    object CreateJob : Screen("create_job")
+    object JobDetail : Screen("job_detail/{offerId}") {
+        fun createRoute(offerId: Long) = "job_detail/$offerId"
+    }
+    object Applications : Screen("applications")
+    object Admin : Screen("admin")
+}
+
+data class BottomNavItem(
+    val screen: Screen,
+    val label: String,
+    val icon: ImageVector
+)
+
+@Composable
+fun AppNavigation(app: KonektaApp) {
+    val navController = rememberNavController()
+    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModel.Factory(app.authRepository))
+    val authState by authViewModel.state.collectAsState()
+
+    val currentUser = authState.currentUser
+    val userRole = currentUser?.role ?: UserRole.CANDIDATE
+
+    val bottomNavItems = remember(userRole) {
+        when (userRole) {
+            UserRole.ADMIN -> listOf(
+                BottomNavItem(Screen.Home, "Início", Icons.Default.Home),
+                BottomNavItem(Screen.Map, "Mapa", Icons.Default.Map),
+                BottomNavItem(Screen.Admin, "Admin", Icons.Default.Work),
+                BottomNavItem(Screen.Profile, "Perfil", Icons.Default.Person)
+            )
+            UserRole.EMPLOYER -> listOf(
+                BottomNavItem(Screen.Home, "Início", Icons.Default.Home),
+                BottomNavItem(Screen.Map, "Mapa", Icons.Default.Map),
+                BottomNavItem(Screen.Applications, "Candidaturas", Icons.Default.Work),
+                BottomNavItem(Screen.Profile, "Perfil", Icons.Default.Person)
+            )
+            else -> listOf(
+                BottomNavItem(Screen.Home, "Início", Icons.Default.Home),
+                BottomNavItem(Screen.Map, "Mapa", Icons.Default.Map),
+                BottomNavItem(Screen.Applications, "Candidaturas", Icons.Default.Work),
+                BottomNavItem(Screen.Profile, "Perfil", Icons.Default.Person)
+            )
+        }
+    }
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    val showBottomBar = currentDestination?.route in bottomNavItems.map { it.screen.route }
+
+    Scaffold(
+        bottomBar = {
+            if (showBottomBar && authState.isLoggedIn) {
+                NavigationBar {
+                    bottomNavItems.forEach { item ->
+                        NavigationBarItem(
+                            icon = { Icon(item.icon, contentDescription = item.label) },
+                            label = { Text(item.label) },
+                            selected = currentDestination?.hierarchy?.any { it.route == item.screen.route } == true,
+                            onClick = {
+                                navController.navigate(item.screen.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = if (authState.isLoggedIn) Screen.Home.route else Screen.Login.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(Screen.Login.route) {
+                LoginScreen(
+                    viewModel = authViewModel,
+                    onLoginSuccess = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    },
+                    onNavigateToRegister = {
+                        navController.navigate(Screen.Register.route)
+                    }
+                )
+            }
+
+            composable(Screen.Register.route) {
+                RegisterScreen(
+                    viewModel = authViewModel,
+                    onRegisterSuccess = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screen.Home.route) {
+                val homeViewModel: HomeViewModel = viewModel(
+                    factory = HomeViewModel.Factory(app.jobRepository, app.categoryRepository)
+                )
+                HomeScreen(
+                    viewModel = homeViewModel,
+                    userRole = userRole,
+                    onOfferClick = { offerId ->
+                        navController.navigate(Screen.JobDetail.createRoute(offerId))
+                    },
+                    onCreateOffer = {
+                        navController.navigate(Screen.CreateJob.route)
+                    }
+                )
+            }
+
+            composable(Screen.Map.route) {
+                val mapViewModel: MapViewModel = viewModel(
+                    factory = MapViewModel.Factory(app.jobRepository)
+                )
+                MapScreen(
+                    viewModel = mapViewModel,
+                    onOfferClick = { offerId ->
+                        navController.navigate(Screen.JobDetail.createRoute(offerId))
+                    }
+                )
+            }
+
+            composable(Screen.Profile.route) {
+                val profileViewModel: ProfileViewModel = viewModel(
+                    factory = ProfileViewModel.Factory(app.authRepository)
+                )
+                currentUser?.let { user ->
+                    ProfileScreen(
+                        userId = user.id,
+                        viewModel = profileViewModel,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+            }
+
+            composable(Screen.CreateJob.route) {
+                val jobViewModel: JobViewModel = viewModel(
+                    factory = JobViewModel.Factory(app.jobRepository)
+                )
+                currentUser?.let { user ->
+                    CreateJobScreen(
+                        currentUser = user,
+                        viewModel = jobViewModel,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+            }
+
+            composable(
+                route = Screen.JobDetail.route,
+                arguments = listOf(navArgument("offerId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val offerId = backStackEntry.arguments?.getLong("offerId") ?: return@composable
+                val jobViewModel: JobViewModel = viewModel(
+                    factory = JobViewModel.Factory(app.jobRepository)
+                )
+                val applicationsViewModel: ApplicationsViewModel = viewModel(
+                    factory = ApplicationsViewModel.Factory(app.jobRepository, app.authRepository)
+                )
+                currentUser?.let { user ->
+                    JobDetailScreen(
+                        offerId = offerId,
+                        currentUser = user,
+                        jobViewModel = jobViewModel,
+                        applicationsViewModel = applicationsViewModel,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+            }
+
+            composable(Screen.Applications.route) {
+                val applicationsViewModel: ApplicationsViewModel = viewModel(
+                    factory = ApplicationsViewModel.Factory(app.jobRepository, app.authRepository)
+                )
+                currentUser?.let { user ->
+                    ApplicationsScreen(
+                        userId = user.id,
+                        userRole = user.role,
+                        viewModel = applicationsViewModel,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+            }
+
+            composable(Screen.Admin.route) {
+                val adminViewModel: AdminViewModel = viewModel(
+                    factory = AdminViewModel.Factory(app.authRepository, app.jobRepository)
+                )
+                AdminScreen(
+                    viewModel = adminViewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+        }
+    }
+}
