@@ -87,27 +87,16 @@ fun HomeScreen(
     val popularOffers = filteredOffers.drop(1).take(5)
     val trendingOffers = if (filteredOffers.size > 6) filteredOffers.drop(6) else filteredOffers
 
-    Scaffold(
-        containerColor = BackgroundLight,
-        floatingActionButton = {
-            if (userRole == UserRole.EMPLOYER || userRole == UserRole.ADMIN) {
-                FloatingActionButton(
-                    onClick = onCreateOffer,
-                    containerColor = GreenPrimary,
-                    contentColor = Color.White,
-                    shape = CircleShape
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Criar Oferta")
-                }
-            }
-        }
-    ) { paddingValues ->
+    // Usamos um Box com fillMaxSize() em vez de um Scaffold aninhado
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BackgroundLight)
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(0.dp)
+            modifier = Modifier.fillMaxSize()
         ) {
+            // 1. Barra de Pesquisa Fixa no Topo
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -148,7 +137,7 @@ fun HomeScreen(
                 )
             }
 
-            // Conteúdo com Scroll
+            // 2. Conteúdo da Lista (Ocupa 100% da altura do ecra)
             if (state.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -158,10 +147,10 @@ fun HomeScreen(
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(bottom = 16.dp)
+                    modifier = Modifier.fillMaxSize(),
+                    // Adicionamos apenas o padding inferior para os cards nao ficarem tapados pela BottomNav
+                    contentPadding = PaddingValues(bottom = 88.dp)
                 ) {
-                    // Se ESTIVER pesquisando: exibe lista limpa de resultados
                     if (isSearching) {
                         item {
                             Text(
@@ -197,9 +186,7 @@ fun HomeScreen(
                             }
                         }
                     } else {
-                        // Se NÃO estiver pesquisando: mostra o layout normal
-
-                        // 2. Banner em Destaque
+                        // Banner Destaque
                         if (featuredOffer != null) {
                             item {
                                 FeaturedHeroCard(
@@ -209,7 +196,7 @@ fun HomeScreen(
                             }
                         }
 
-                        // 3. Categorias (Logo após o Banner)
+                        // Categorias
                         if (state.categories.isNotEmpty()) {
                             item {
                                 Spacer(modifier = Modifier.height(4.dp))
@@ -236,7 +223,7 @@ fun HomeScreen(
                             }
                         }
 
-                        // 4. Secção "Ofertas Populares"
+                        // Seção Populares
                         if (popularOffers.isNotEmpty()) {
                             item {
                                 SectionHeader(title = "Populares", showSeeAll = false)
@@ -257,7 +244,7 @@ fun HomeScreen(
                             }
                         }
 
-                        // 5. Secção "Em Alta Agora"
+                        // Seção Vagas
                         if (trendingOffers.isNotEmpty()) {
                             item {
                                 SectionHeader(title = "Vagas", showSeeAll = false)
@@ -291,48 +278,122 @@ fun HomeScreen(
                 }
             }
         }
+
+        // 3. Botão Flutuante (FAB) posicionamento manual dentro do Box
+        if (userRole == UserRole.EMPLOYER || userRole == UserRole.ADMIN) {
+            FloatingActionButton(
+                onClick = onCreateOffer,
+                containerColor = GreenPrimary,
+                contentColor = Color.White,
+                shape = CircleShape,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 16.dp, bottom = 16.dp)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Criar Oferta")
+            }
+        }
     }
 }
 
 // Categoria "Todas" com Ícone Vetorial
+//@Composable
+//fun CategoryCircleItemWithIcon(
+//    label: String,
+//    isSelected: Boolean,
+//    onClick: () -> Unit
+//) {
+//    Column(
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        modifier = Modifier.clickable(onClick = onClick)
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .size(52.dp)
+//                .background(
+//                    if (isSelected) GreenPrimary else Color.White,
+//                    CircleShape
+//                )
+//                .clip(CircleShape),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Icon(
+//                imageVector = Icons.Default.Apps,
+//                contentDescription = label,
+//                tint = if (isSelected) Color.White else TextDark,
+//                modifier = Modifier.size(24.dp)
+//            )
+//        }
+//        Spacer(modifier = Modifier.height(6.dp))
+//        Text(
+//            text = label,
+//            fontSize = 11.sp,
+//            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+//            color = if (isSelected) GreenPrimary else TextMuted
+//        )
+//    }
+//}
+
 @Composable
 fun CategoryCircleItemWithIcon(
     label: String,
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable(onClick = onClick)
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (isSelected) GreenPrimary else Color(0xFFF2F4F7))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 10.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier
-                .size(52.dp)
-                .background(
-                    if (isSelected) GreenPrimary else Color.White,
-                    CircleShape
-                )
-                .clip(CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.Apps,
-                contentDescription = label,
-                tint = if (isSelected) Color.White else TextDark,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-        Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = label,
-            fontSize = 11.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) GreenPrimary else TextMuted
+            fontSize = 14.sp,
+            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+            color = if (isSelected) Color.White else TextDark
         )
     }
 }
 
 // Categoria Normal
+//@Composable
+//fun CategoryCircleItem(
+//    label: String,
+//    icon: String,
+//    isSelected: Boolean,
+//    onClick: () -> Unit
+//) {
+//    Column(
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        modifier = Modifier.clickable(onClick = onClick)
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .size(52.dp)
+//                .background(
+//                    if (isSelected) GreenPrimary else Color.White,
+//                    CircleShape
+//                )
+//                .clip(CircleShape),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Text(
+//                text = icon,
+//                fontSize = 20.sp
+//            )
+//        }
+//        Spacer(modifier = Modifier.height(6.dp))
+//        Text(
+//            text = label,
+//            fontSize = 11.sp,
+//            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+//            color = if (isSelected) GreenPrimary else TextMuted
+//        )
+//    }
+//}
+
 @Composable
 fun CategoryCircleItem(
     label: String,
@@ -340,31 +401,19 @@ fun CategoryCircleItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable(onClick = onClick)
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (isSelected) GreenPrimary else Color(0xFFF2F4F7))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 10.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier
-                .size(52.dp)
-                .background(
-                    if (isSelected) GreenPrimary else Color.White,
-                    CircleShape
-                )
-                .clip(CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = icon,
-                fontSize = 20.sp
-            )
-        }
-        Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = label,
-            fontSize = 11.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) GreenPrimary else TextMuted
+            fontSize = 14.sp,
+            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+            color = if (isSelected) Color.White else TextDark
         )
     }
 }

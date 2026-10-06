@@ -102,37 +102,44 @@ fun ApplicationsScreen(
 
     val applications = if (userRole == UserRole.CANDIDATE) state.myApplications else state.jobApplications
 
-    Scaffold(
-        containerColor = BackgroundLight,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = if (userRole == UserRole.CANDIDATE) "Minhas Candidaturas" else "Candidaturas Recebidas",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        color = TextDark
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar",
-                            tint = TextDark
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundLight)
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
+//    Scaffold(
+//        containerColor = BackgroundLight,
+//        topBar = {
+//            TopAppBar(
+//                title = {
+//                    Text(
+//                        text = if (userRole == UserRole.CANDIDATE) "Minhas Candidaturas" else "Candidaturas Recebidas",
+//                        fontWeight = FontWeight.Bold,
+//                        fontSize = 18.sp,
+//                        color = TextDark
+//                    )
+//                },
+//                navigationIcon = {
+//                    IconButton(onClick = onNavigateBack) {
+//                        Icon(
+//                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+//                            contentDescription = "Voltar",
+//                            tint = TextDark
+//                        )
+//                    }
+//                },
+//                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundLight)
+//            )
+//        },
+//        snackbarHost = { SnackbarHost(snackbarHostState) }
+//    ) { paddingValues ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 16.dp)
+            .background(color = Color.White)
+    ){
         if (state.isLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
+//                    .padding(paddingValues),
+                        ,
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(color = GreenPrimary)
@@ -141,27 +148,52 @@ fun ApplicationsScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
+//                    .padding(paddingValues)
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = if (userRole == UserRole.CANDIDATE) "Ainda não se candidatou a nenhuma oferta." else "Nenhuma candidatura recebida.",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = TextMuted
-                )
+                Column {
+                    Text(
+                        text = if (userRole == UserRole.CANDIDATE) "Minhas Candidaturas" else "Candidaturas Recebidas",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = TextDark
+                    )
+                    Spacer(modifier = Modifier
+                        .height(2.dp))
+                    Text(
+                        text = if (userRole == UserRole.CANDIDATE) "Ainda não se candidatou a nenhuma vaga." else "Nenhuma candidatura recebida.",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = TextMuted
+                    )
+                }
+
             }
         } else {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
+//                    .padding(paddingValues)
                     .imePadding()
                     .navigationBarsPadding(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
+                item {
+                    Column {
+                        Text(
+                            text = if (userRole == UserRole.CANDIDATE) "Minhas Candidaturas" else "Candidaturas Recebidas",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            color = TextDark
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .height(2.dp)
+                        )
+                    }
+                }
                 items(applications) { app ->
                     ApplicationCard(
                         application = app,

@@ -82,7 +82,7 @@ import java.util.Date
 import java.util.Locale
 
 private val GreenPrimary = Color(0xFF00A843)
-private val BackgroundLight = Color(0xFFFAFAFA)
+private val BackgroundLight = Color(0xFFFFFFFF)
 private val SearchBgColor = Color(0xFFF2F4F7)
 private val TextDark = Color(0xFF1D2939)
 private val TextMuted = Color(0xFF667085)
@@ -132,37 +132,44 @@ fun JobDetailScreen(
         }
     }
 
-    Scaffold(
-        containerColor = BackgroundLight,
-        topBar = {
-            TopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar",
-                            tint = TextDark
-                        )
-                    }
-                },
-                actions = {
-                    if (currentUser.role == UserRole.ADMIN || (currentUser.role == UserRole.EMPLOYER && currentUser.id == jobState.selectedOffer?.employerId)) {
-                        IconButton(onClick = onEditOffer) {
-                            Icon(Icons.Default.Edit, contentDescription = "Editar", tint = GreenPrimary)
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundLight)
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
+//    Scaffold(
+//        containerColor = BackgroundLight,
+//        topBar = {
+//            TopAppBar(
+//                title = { },
+//                navigationIcon = {
+//                    IconButton(onClick = onNavigateBack) {
+//                        Icon(
+//                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+//                            contentDescription = "Voltar",
+//                            tint = TextDark
+//                        )
+//                    }
+//                },
+//                actions = {
+//                    if (currentUser.role == UserRole.ADMIN || (currentUser.role == UserRole.EMPLOYER && currentUser.id == jobState.selectedOffer?.employerId)) {
+//                        IconButton(onClick = onEditOffer) {
+//                            Icon(Icons.Default.Edit, contentDescription = "Editar", tint = GreenPrimary)
+//                        }
+//                    }
+//                },
+//                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundLight)
+//            )
+//        },
+//        snackbarHost = { SnackbarHost(snackbarHostState) }
+//    ) { paddingValues ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BackgroundLight)
+            .padding(top = 16.dp)
+
+    ) {
         if (jobState.isLoading) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+                    .fillMaxSize(),
+//                    .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(color = GreenPrimary)
@@ -172,23 +179,22 @@ fun JobDetailScreen(
             if (offer == null) {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
+                        .fillMaxSize(),
+//                        .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Oferta não encontrada", color = TextMuted, fontSize = 16.sp)
+                    Text("Vaga não encontrada", color = TextMuted, fontSize = 16.sp)
                 }
             } else {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
+//                        .padding(paddingValues)
                         .imePadding()
                         .navigationBarsPadding()
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 20.dp)
                 ) {
-                    // Imagem/Capa em Destaque
                     if (offer.imagePath.isNotBlank()) {
                         Box(
                             modifier = Modifier
@@ -207,7 +213,6 @@ fun JobDetailScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                     }
 
-                    // Nome da Empresa & Ações
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -230,12 +235,21 @@ fun JobDetailScreen(
                         }
 
                         if (offer.salary.isNotBlank()) {
-                            Text(
-                                text = offer.salary,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = TextDark
-                            )
+                            Column() {
+                                Text(
+                                    text = "Proposta",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = TextMuted
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = "${offer.salary},00MZN",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = TextDark
+                                )
+                            }
                         }
                     }
 
@@ -335,7 +349,12 @@ fun JobDetailScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Publicado em ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(offer.createdAt))}",
+                        text = "Publicado em ${
+                            SimpleDateFormat(
+                                "dd/MM/yyyy",
+                                Locale.getDefault()
+                            ).format(Date(offer.createdAt))
+                        }",
                         fontSize = 12.sp,
                         color = TextMuted
                     )
@@ -387,11 +406,22 @@ fun JobDetailScreen(
                                 .fillMaxWidth()
                                 .height(50.dp),
                             shape = RoundedCornerShape(25.dp),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE53935))
+                            border = androidx.compose.foundation.BorderStroke(
+                                1.dp,
+                                Color(0xFFE53935)
+                            )
                         ) {
-                            Icon(Icons.Default.Delete, contentDescription = null, tint = Color(0xFFE53935))
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = null,
+                                tint = Color(0xFFE53935)
+                            )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Eliminar Oferta", fontWeight = FontWeight.Bold, color = Color(0xFFE53935))
+                            Text(
+                                "Eliminar Oferta",
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFE53935)
+                            )
                         }
                     }
 
@@ -418,7 +448,11 @@ fun JobDetailScreen(
                                     .fillMaxWidth()
                                     .imePadding()
                             ) {
-                                Text("Carta de apresentação (PDF):", fontSize = 13.sp, color = TextMuted)
+                                Text(
+                                    "Carta de apresentação (PDF):",
+                                    fontSize = 13.sp,
+                                    color = TextMuted
+                                )
                                 Spacer(modifier = Modifier.height(8.dp))
 
                                 OutlinedButton(
@@ -426,7 +460,11 @@ fun JobDetailScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                     shape = RoundedCornerShape(16.dp)
                                 ) {
-                                    Icon(Icons.Default.AttachFile, contentDescription = null, tint = GreenPrimary)
+                                    Icon(
+                                        Icons.Default.AttachFile,
+                                        contentDescription = null,
+                                        tint = GreenPrimary
+                                    )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         if (pdfName.isNotBlank()) pdfName else "Selecionar PDF",
@@ -437,12 +475,23 @@ fun JobDetailScreen(
 
                                 Spacer(modifier = Modifier.height(16.dp))
 
-                                Text("Mensagem / Apresentação:", fontSize = 13.sp, color = TextDark, fontWeight = FontWeight.SemiBold)
+                                Text(
+                                    "Mensagem / Apresentação:",
+                                    fontSize = 13.sp,
+                                    color = TextDark,
+                                    fontWeight = FontWeight.SemiBold
+                                )
                                 Spacer(modifier = Modifier.height(6.dp))
                                 OutlinedTextField(
                                     value = coverLetter,
                                     onValueChange = { coverLetter = it },
-                                    placeholder = { Text("Escreva uma mensagem de apresentação...", color = TextMuted, fontSize = 13.sp) },
+                                    placeholder = {
+                                        Text(
+                                            "Escreva uma mensagem de apresentação...",
+                                            color = TextMuted,
+                                            fontSize = 13.sp
+                                        )
+                                    },
                                     maxLines = 4,
                                     shape = RoundedCornerShape(16.dp),
                                     colors = OutlinedTextFieldDefaults.colors(
@@ -458,7 +507,11 @@ fun JobDetailScreen(
                         confirmButton = {
                             Button(
                                 onClick = {
-                                    applicationsViewModel.applyForJob(currentUser, offer, coverLetter)
+                                    applicationsViewModel.applyForJob(
+                                        currentUser,
+                                        offer,
+                                        coverLetter
+                                    )
                                 },
                                 shape = RoundedCornerShape(20.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
@@ -473,9 +526,20 @@ fun JobDetailScreen(
                         }
                     )
                 }
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            bottom = 16.dp
+                        )
+                )
             }
         }
     }
+//    }
 }
 
 @Composable

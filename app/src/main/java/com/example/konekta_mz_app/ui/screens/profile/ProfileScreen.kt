@@ -149,8 +149,8 @@ fun ProfileScreen(
         }
     }
 
-    Scaffold(
-        containerColor = BackgroundLight,
+//    Scaffold(
+//        containerColor = BackgroundLight,
 //        topBar = {
 //            TopAppBar(
 //                title = {
@@ -182,13 +182,20 @@ fun ProfileScreen(
 //                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundLight)
 //            )
 //        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
+//        snackbarHost = { SnackbarHost(snackbarHostState) }
+//    ) { paddingValues ->
+    Box (
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .background(color = Color.White)
+    ){
         if (state.isLoading && !isInitialized) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
+//                    .padding(paddingValues),
+                        ,
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(color = GreenPrimary)
@@ -199,7 +206,9 @@ fun ProfileScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues),
+//                        .padding(paddingValues),
+
+                            ,
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -211,12 +220,12 @@ fun ProfileScreen(
             } else {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
+//                        .fillMaxSize()
+//                        .padding(paddingValues)
                         .imePadding()
                         .navigationBarsPadding()
                         .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 20.dp, vertical = 12.dp),
+                        .padding(horizontal = 20.dp, vertical = 0   .dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Avatar com botão de alteração de imagem

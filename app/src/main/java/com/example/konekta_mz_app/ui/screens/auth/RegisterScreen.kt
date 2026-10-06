@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -42,7 +41,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -155,18 +153,18 @@ fun RegisterScreen(
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = Color.White
-    ) { paddingValues ->
+    // Substituído Scaffold por Box para remover paddings/insets aninhados
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .imePadding()
-                .navigationBarsPadding()
-                .padding(horizontal = 24.dp)
-                .verticalScroll(scrollState),
+                .verticalScroll(scrollState)
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(24.dp))
@@ -563,10 +561,8 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Botão Principal
-            // Botão Principal
             Button(
                 onClick = {
-                    // 1. Validação de Campos Obrigatórios Gerais
                     if (name.isBlank() || email.isBlank() || phone.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
                         scope.launch {
                             snackbarHostState.showSnackbar("Por favor, preencha todos os campos obrigatórios.")
@@ -574,7 +570,6 @@ fun RegisterScreen(
                         return@Button
                     }
 
-                    // 2. Validação de Senha
                     if (password != confirmPassword) {
                         scope.launch {
                             snackbarHostState.showSnackbar("As senhas não coincidem.")
@@ -589,7 +584,6 @@ fun RegisterScreen(
                         return@Button
                     }
 
-                    // 3. Validação Específica para Empregador
                     if (selectedRole == UserRole.EMPLOYER && companyName.isBlank()) {
                         scope.launch {
                             snackbarHostState.showSnackbar("Por favor, insira o nome da empresa.")
@@ -597,7 +591,6 @@ fun RegisterScreen(
                         return@Button
                     }
 
-                    // 4. Executar o Registo
                     viewModel.register(
                         name = name.trim(),
                         email = email.trim(),
@@ -611,7 +604,6 @@ fun RegisterScreen(
                         companyDescription = companyDescription.trim()
                     )
                 },
-                // O botão fica desativado APENAS enquanto estiver a carregar o pedido
                 enabled = !state.isLoading,
                 shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -655,7 +647,15 @@ fun RegisterScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(32.dp))
         }
+
+        // Host das mensagens do Snackbar na parte inferior da tela
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp)
+        )
     }
 }

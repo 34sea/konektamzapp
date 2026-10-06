@@ -109,37 +109,44 @@ fun AdminScreen(
         }
     }
 
-    Scaffold(
-        containerColor = BackgroundLight,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Painel de Administração",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        color = TextDark
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar",
-                            tint = TextDark
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundLight)
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
+//    Scaffold(
+//        containerColor = BackgroundLight,
+//        topBar = {
+//            TopAppBar(
+//                title = {
+//                    Text(
+//                        text = "Painel de Administração",
+//                        fontWeight = FontWeight.Bold,
+//                        fontSize = 18.sp,
+//                        color = TextDark
+//                    )
+//                },
+//                navigationIcon = {
+//                    IconButton(onClick = onNavigateBack) {
+//                        Icon(
+//                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+//                            contentDescription = "Voltar",
+//                            tint = TextDark
+//                        )
+//                    }
+//                },
+//                colors = TopAppBarDefaults.topAppBarColors(containerColor = BackgroundLight)
+//            )
+//        },
+//        snackbarHost = { SnackbarHost(snackbarHostState) }
+//    ) { paddingValues ->
+    Box (
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color.White)
+            .padding(top = 16.dp)
+    ){
         if (state.isLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
+//                    .padding(paddingValues)
+                ,
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(color = GreenPrimary)
@@ -148,11 +155,10 @@ fun AdminScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
+//                    .padding(paddingValues)
                     .imePadding()
                     .navigationBarsPadding()
             ) {
-                // Conteúdo superior com estatísticas e gráficos
                 Column(
                     modifier = Modifier
                         .verticalScroll(rememberScrollState())
@@ -283,6 +289,16 @@ fun AdminScreen(
                 }
             }
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                )
+        )
     }
 }
 

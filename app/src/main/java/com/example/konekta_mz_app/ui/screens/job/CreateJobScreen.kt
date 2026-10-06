@@ -156,39 +156,44 @@ fun CreateJobScreen(
         }
     }
 
-    Scaffold(
-        containerColor = BackgroundLight,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "Criar",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        color = TextDark
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar",
-                            tint = TextDark
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = BackgroundLight
-                )
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
+//    Scaffold(
+//        containerColor = BackgroundLight,
+//        topBar = {
+//            TopAppBar(
+//                title = {
+//                    Text(
+//                        "Criar",
+//                        fontWeight = FontWeight.Bold,
+//                        fontSize = 18.sp,
+//                        color = TextDark
+//                    )
+//                },
+//                navigationIcon = {
+//                    IconButton(onClick = onNavigateBack) {
+//                        Icon(
+//                            Icons.AutoMirrored.Filled.ArrowBack,
+//                            contentDescription = "Voltar",
+//                            tint = TextDark
+//                        )
+//                    }
+//                },
+//                colors = TopAppBarDefaults.topAppBarColors(
+//                    containerColor = BackgroundLight
+//                )
+//            )
+//        },
+//        snackbarHost = { SnackbarHost(snackbarHostState) }
+//    ) { paddingValues ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color.White)
+    ){
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .imePadding() // 📌 Faz o layout subir quando o teclado abre
+//                .padding(paddingValues)
+                .imePadding()
                 .navigationBarsPadding()
                 .padding(horizontal = 16.dp)
                 .verticalScroll(scrollState),
@@ -475,7 +480,7 @@ fun CreateJobScreen(
                     )
                 } else {
                     Text(
-                        text = "Publicar Oferta",
+                        text = "Publicar",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White

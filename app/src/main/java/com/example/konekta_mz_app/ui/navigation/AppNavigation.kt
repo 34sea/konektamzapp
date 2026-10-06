@@ -97,6 +97,10 @@ data class BottomNavItem(
     val unselectedIcon: ImageVector
 )
 
+val routesWithoutProfileBar = setOf(
+    Screen.Map.route
+)
+
 @Composable
 fun AppNavigation(app: KonektaApp) {
     val navController = rememberNavController()
@@ -240,10 +244,10 @@ fun AppNavigation(app: KonektaApp) {
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(color = Color.White)
-                .padding(bottom = 0.dp)
+                .padding(0.dp)
         ) {
             // Profile Bar no topo
-            if (authState.isLoggedIn && currentUser != null) {
+            if (authState.isLoggedIn && currentUser != null && currentDestination?.route !in routesWithoutProfileBar) {
                 ProfileBar(
                     user = currentUser,
                     onProfileClick = { navController.navigate(Screen.Profile.route) }
@@ -265,6 +269,18 @@ fun AppNavigation(app: KonektaApp) {
                         },
                         onNavigateToRegister = {
                             navController.navigate(Screen.Register.route)
+                        }
+                    )
+                }
+
+                composable(Screen.Map.route) {
+                    val mapViewModel: MapViewModel = viewModel(
+                        factory = MapViewModel.Factory(app.jobRepository)
+                    )
+                    MapScreen(
+                        viewModel = mapViewModel,
+                        onOfferClick = { offerId ->
+                            navController.navigate(Screen.JobDetail.createRoute(offerId))
                         }
                     )
                 }
@@ -311,17 +327,7 @@ fun AppNavigation(app: KonektaApp) {
                     )
                 }
 
-                composable(Screen.Map.route) {
-                    val mapViewModel: MapViewModel = viewModel(
-                        factory = MapViewModel.Factory(app.jobRepository)
-                    )
-                    MapScreen(
-                        viewModel = mapViewModel,
-                        onOfferClick = { offerId ->
-                            navController.navigate(Screen.JobDetail.createRoute(offerId))
-                        }
-                    )
-                }
+
 
                 composable(Screen.Profile.route) {
                     val profileViewModel: ProfileViewModel = viewModel(

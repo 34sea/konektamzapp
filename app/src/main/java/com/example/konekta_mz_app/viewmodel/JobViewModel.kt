@@ -65,7 +65,7 @@ class JobViewModel(
                 jobRepository.createOffer(offer)
                 _state.value = _state.value.copy(
                     isLoading = false,
-                    successMessage = "Oferta criada com sucesso!"
+                    successMessage = "Criada com sucesso!"
                 )
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
@@ -83,7 +83,7 @@ class JobViewModel(
                 jobRepository.updateOffer(offer)
                 _state.value = _state.value.copy(
                     isLoading = false,
-                    successMessage = "Oferta atualizada com sucesso!"
+                    successMessage = "Atualizada com sucesso!"
                 )
             } catch (e: Exception) {
                 _state.value = _state.value.copy(

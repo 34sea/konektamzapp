@@ -6,7 +6,15 @@ import kotlinx.coroutines.flow.Flow
 
 class CategoryRepository(private val categoryDao: CategoryDao) {
 
-    fun getAllCategories(): Flow<List<Category>> = categoryDao.getAllCategories()
+    fun getAllCategories(): Flow<List<Category>> =
+        categoryDao.getAllCategories()
 
-    suspend fun insertCategory(category: Category): Long = categoryDao.insertCategory(category)
+    suspend fun insertCategory(category: Category): Long =
+        categoryDao.insertCategory(category)
+
+    suspend fun updateCategory(category: Category) =
+        categoryDao.updateCategory(category)
+
+    suspend fun deleteCategory(category: Category) =
+        categoryDao.deleteCategory(category)
 }
