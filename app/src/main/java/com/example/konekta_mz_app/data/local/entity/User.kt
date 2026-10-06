@@ -25,5 +25,6 @@ data class User(
     val experience: String = "",
     val companyName: String = "",
     val companyDescription: String = "",
+    val profileImagePath: String = "",
     val createdAt: Long = System.currentTimeMillis()
 )

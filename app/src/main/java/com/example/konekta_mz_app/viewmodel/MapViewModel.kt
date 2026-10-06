@@ -16,7 +16,7 @@ data class MapState(
     val isLoading: Boolean = true,
     val userLatitude: Double = -25.9692, // Maputo default
     val userLongitude: Double = 32.5732,
-    val zoomLevel: Double = 12.0
+    val zoomLevel: Double = 19.0
 )
 
 class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {

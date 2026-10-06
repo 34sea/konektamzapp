@@ -20,6 +20,7 @@ data class JobOffer(
     val benefits: String = "",
     val contactEmail: String = "",
     val contactPhone: String = "",
+    val imagePath: String = "",
     val isActive: Boolean = true,
     val createdAt: Long = System.currentTimeMillis()
 )

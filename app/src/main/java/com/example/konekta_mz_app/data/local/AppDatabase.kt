@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 
 @Database(
     entities = [User::class, JobOffer::class, JobApplication::class, Category::class],
-    version = 1,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -43,12 +43,22 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "konekta_database"
                 )
+                    .fallbackToDestructiveMigration()
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
                             INSTANCE?.let { database ->
                                 CoroutineScope(Dispatchers.IO).launch {
                                     populateDatabase(database)
+                                }
+                            }
+                        }
+
+                        override fun onOpen(db: SupportSQLiteDatabase) {
+                            super.onOpen(db)
+                            INSTANCE?.let { database ->
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    ensureAdminExists(database)
                                 }
                             }
                         }
@@ -62,31 +72,38 @@ abstract class AppDatabase : RoomDatabase() {
         private suspend fun populateDatabase(database: AppDatabase) {
             // Seed default categories
             val categories = listOf(
-                Category(name = "Construção", icon = "🏗️"),
-                Category(name = "Agricultura", icon = "🌾"),
-                Category(name = "Comércio", icon = "🛒"),
-                Category(name = "Serviços", icon = "🔧"),
-                Category(name = "Tecnologia", icon = "💻"),
-                Category(name = "Educação", icon = "📚"),
-                Category(name = "Saúde", icon = "🏥"),
-                Category(name = "Transportes", icon = "🚚"),
-                Category(name = "Hotelaria", icon = "🏨"),
-                Category(name = "Limpeza", icon = "🧹"),
-                Category(name = "Segurança", icon = "🔒"),
-                Category(name = "Outros", icon = "📋")
+                Category(name = "Construção", icon = "construction"),
+                Category(name = "Agricultura", icon = "agriculture"),
+                Category(name = "Comércio", icon = "commerce"),
+                Category(name = "Serviços", icon = "services"),
+                Category(name = "Tecnologia", icon = "tech"),
+                Category(name = "Educação", icon = "education"),
+                Category(name = "Saúde", icon = "health"),
+                Category(name = "Transportes", icon = "transport"),
+                Category(name = "Hotelaria", icon = "hotel"),
+                Category(name = "Limpeza", icon = "cleaning"),
+                Category(name = "Segurança", icon = "security"),
+                Category(name = "Outros", icon = "other")
             )
             database.categoryDao().insertAll(categories)
 
             // Seed default admin user
-            val admin = User(
-                name = "Administrador",
-                email = "admin@konekta.co.mz",
-                password = "admin123",
-                role = UserRole.ADMIN,
-                phone = "+258 84 000 0000",
-                location = "Maputo, Moçambique"
-            )
-            database.userDao().insertUser(admin)
+            ensureAdminExists(database)
+        }
+
+        private suspend fun ensureAdminExists(database: AppDatabase) {
+            val existingAdmin = database.userDao().getFirstAdmin()
+            if (existingAdmin == null) {
+                val admin = User(
+                    name = "Administrador",
+                    email = "admin@konekta.co.mz",
+                    password = "admin123",
+                    role = UserRole.ADMIN,
+                    phone = "+258 84 000 0000",
+                    location = "Maputo, Moçambique"
+                )
+                database.userDao().insertUser(admin)
+            }
         }
     }
 }

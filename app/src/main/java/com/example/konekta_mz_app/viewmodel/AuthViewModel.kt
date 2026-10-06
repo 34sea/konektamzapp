@@ -1,11 +1,13 @@
 package com.example.konekta_mz_app.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.konekta_mz_app.data.local.entity.User
 import com.example.konekta_mz_app.data.local.entity.UserRole
 import com.example.konekta_mz_app.data.repository.AuthRepository
+import com.example.konekta_mz_app.util.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,14 +21,35 @@ data class AuthState(
     val successMessage: String? = null
 )
 
-class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
+class AuthViewModel(
+    application: Application,
+    private val authRepository: AuthRepository
+) : AndroidViewModel(application) {
+
+    private val sessionManager = SessionManager(application)
 
     private val _state = MutableStateFlow(AuthState())
     val state: StateFlow<AuthState> = _state.asStateFlow()
 
     init {
-        // Check if there's a logged-in user (in a real app, use DataStore/SharedPreferences)
-        _state.value = _state.value.copy(isLoggedIn = false)
+        // Check if user has an active session
+        if (sessionManager.isLoggedIn()) {
+            val userId = sessionManager.getUserId()
+            if (userId > 0) {
+                viewModelScope.launch {
+                    val user = authRepository.getUserById(userId)
+                    if (user != null) {
+                        _state.value = _state.value.copy(
+                            isLoggedIn = true,
+                            currentUser = user
+                        )
+                    } else {
+                        // User not found in DB, clear session
+                        sessionManager.clearSession()
+                    }
+                }
+            }
+        }
     }
 
     fun login(email: String, password: String) {
@@ -35,6 +58,14 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
             val result = authRepository.login(email, password)
             result.fold(
                 onSuccess = { user ->
+                    // Save session
+                    sessionManager.saveSession(
+                        userId = user.id,
+                        name = user.name,
+                        email = user.email,
+                        role = user.role.name,
+                        imagePath = user.profileImagePath
+                    )
                     _state.value = _state.value.copy(
                         isLoading = false,
                         isLoggedIn = true,
@@ -59,6 +90,8 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
         role: UserRole,
         phone: String = "",
         location: String = "",
+        latitude: Double = 0.0,
+        longitude: Double = 0.0,
         companyName: String = "",
         companyDescription: String = ""
     ) {
@@ -66,7 +99,7 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
             _state.value = _state.value.copy(isLoading = true, error = null)
             val result = authRepository.register(
                 name, email, password, role, phone, location,
-                companyName = companyName, companyDescription = companyDescription
+                latitude, longitude, companyName, companyDescription
             )
             result.fold(
                 onSuccess = {
@@ -86,6 +119,7 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
     }
 
     fun logout() {
+        sessionManager.clearSession()
         _state.value = AuthState()
     }
 
@@ -101,13 +135,24 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
         viewModelScope.launch {
             authRepository.updateUser(user)
             _state.value = _state.value.copy(currentUser = user)
+            // Update session with new data
+            sessionManager.saveSession(
+                userId = user.id,
+                name = user.name,
+                email = user.email,
+                role = user.role.name,
+                imagePath = user.profileImagePath
+            )
         }
     }
 
-    class Factory(private val authRepository: AuthRepository) : ViewModelProvider.Factory {
+    class Factory(
+        private val application: Application,
+        private val authRepository: AuthRepository
+    ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return AuthViewModel(authRepository) as T
+        override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+            return AuthViewModel(application, authRepository) as T
         }
     }
 }
