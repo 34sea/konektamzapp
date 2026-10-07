@@ -201,7 +201,6 @@ fun CreateJobScreen(
         ) {
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Box de Seleção de Imagem
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
@@ -273,7 +272,6 @@ fun CreateJobScreen(
                 }
             }
 
-            // Título
             CustomOutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
@@ -282,7 +280,6 @@ fun CreateJobScreen(
                 leadingIcon = Icons.Default.Work
             )
 
-            // Selector de Categoria
             CategorySelect(
                 categories = categories,
                 selectedCategory = category,
@@ -291,7 +288,6 @@ fun CreateJobScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Descrição
             CustomOutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
@@ -301,7 +297,6 @@ fun CreateJobScreen(
                 maxLines = 4
             )
 
-            // Salário
             CustomOutlinedTextField(
                 value = salary,
                 onValueChange = { salary = it },
@@ -311,7 +306,6 @@ fun CreateJobScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
             )
 
-            // Localização
             CustomOutlinedTextField(
                 value = location,
                 onValueChange = { location = it },
@@ -320,7 +314,6 @@ fun CreateJobScreen(
                 leadingIcon = Icons.Default.LocationOn
             )
 
-            // Requisitos Dinâmicos
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
@@ -408,7 +401,6 @@ fun CreateJobScreen(
                 }
             }
 
-            // Benefícios
             CustomOutlinedTextField(
                 value = benefits,
                 onValueChange = { benefits = it },
@@ -418,7 +410,6 @@ fun CreateJobScreen(
                 maxLines = 3
             )
 
-            // Email de Contacto
             CustomOutlinedTextField(
                 value = contactEmail,
                 onValueChange = { contactEmail = it },
@@ -428,7 +419,6 @@ fun CreateJobScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
 
-            // Telefone de Contacto
             CustomOutlinedTextField(
                 value = contactPhone,
                 onValueChange = { contactPhone = it },
@@ -440,7 +430,6 @@ fun CreateJobScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Botão Publicar Oferta
             Button(
                 onClick = {
                     val requirementsText = requirements.filter { it.isNotBlank() }.joinToString("\n")
@@ -490,6 +479,16 @@ fun CreateJobScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                )
+        )
     }
 }
 

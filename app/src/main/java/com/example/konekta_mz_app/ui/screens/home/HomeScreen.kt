@@ -85,7 +85,8 @@ fun HomeScreen(
 
     val featuredOffer = filteredOffers.firstOrNull()
     val popularOffers = filteredOffers.drop(1).take(5)
-    val trendingOffers = if (filteredOffers.size > 6) filteredOffers.drop(6) else filteredOffers
+    val trendingOffers = filteredOffers
+//    val trendingOffers = if (filteredOffers.size > 6) filteredOffers.drop(6) else filteredOffers
 
     // Usamos um Box com fillMaxSize() em vez de um Scaffold aninhado
     Box(

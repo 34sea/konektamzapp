@@ -4,8 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
@@ -16,6 +18,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.WorkOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -33,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -58,16 +62,16 @@ import com.example.konekta_mz_app.ui.screens.job.CreateJobScreen
 import com.example.konekta_mz_app.ui.screens.job.EditJobScreen
 import com.example.konekta_mz_app.ui.screens.job.JobDetailScreen
 import com.example.konekta_mz_app.ui.screens.map.MapScreen
+import com.example.konekta_mz_app.ui.screens.map.MapViewModel
 import com.example.konekta_mz_app.ui.screens.profile.ProfileScreen
 import com.example.konekta_mz_app.viewmodel.AdminViewModel
 import com.example.konekta_mz_app.viewmodel.ApplicationsViewModel
 import com.example.konekta_mz_app.viewmodel.AuthViewModel
 import com.example.konekta_mz_app.viewmodel.HomeViewModel
 import com.example.konekta_mz_app.viewmodel.JobViewModel
-import com.example.konekta_mz_app.viewmodel.MapViewModel
+//import com.example.konekta_mz_app.viewmodel.MapViewModel
 import com.example.konekta_mz_app.viewmodel.ProfileViewModel
 
-// Cores personalizadas do menu inferior
 private val GreenPrimary = Color(0xFF00A843)
 private val NavInactive = Color(0xFF8E8E93)
 
@@ -143,28 +147,83 @@ fun AppNavigation(app: KonektaApp) {
 
     val showBottomBar = currentDestination?.route in bottomNavItems.map { it.screen.route }
 
-    // Diálogo de confirmação de Logout
+//    if (showLogoutDialog) {
+//        AlertDialog(
+//            onDismissRequest = { showLogoutDialog = false },
+//            title = { Text("Sair") },
+//            text = { Text("Tem a certeza que deseja sair?") },
+//            confirmButton = {
+//                TextButton(onClick = {
+//                    showLogoutDialog = false
+//                    authViewModel.logout()
+//                    navController.navigate(Screen.Login.route) {
+//                        popUpTo(0) { inclusive = true }
+//                    }
+//                }) {
+//                    Text("Sair", color = Color.Red)
+//                }
+//            },
+//            dismissButton = {
+//                TextButton(onClick = { showLogoutDialog = false }) {
+//                    Text("Cancelar")
+//                }
+//            }
+//        )
+//    }
+
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
-            title = { Text("Sair") },
-            text = { Text("Tem a certeza que deseja sair?") },
+            icon = {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+            },
+            title = {
+                Text(
+                    text = "Terminar Sessão",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = "Tem a certeza que deseja sair da sua conta?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
+                )
+            },
             confirmButton = {
-                TextButton(onClick = {
-                    showLogoutDialog = false
-                    authViewModel.logout()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
+                TextButton(
+                    onClick = {
+                        showLogoutDialog = false
+                        authViewModel.logout()
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
                     }
-                }) {
-                    Text("Sair", color = Color.Red)
+                ) {
+                    Text(
+                        text = "Sair",
+                        color = MaterialTheme.colorScheme.error,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showLogoutDialog = false }) {
-                    Text("Cancelar")
+                TextButton(
+                    onClick = { showLogoutDialog = false }
+                ) {
+                    Text(
+                        text = "Cancelar",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-            }
+            },
+            shape = RoundedCornerShape(28.dp),
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         )
     }
 
@@ -198,7 +257,7 @@ fun AppNavigation(app: KonektaApp) {
                                 selectedTextColor = GreenPrimary,
                                 unselectedIconColor = NavInactive,
                                 unselectedTextColor = NavInactive,
-                                indicatorColor = Color.Transparent // Remove a pílula/fundo no ícone ativo
+                                indicatorColor = Color.Transparent
                             ),
                             onClick = {
                                 navController.navigate(item.screen.route) {
@@ -212,7 +271,6 @@ fun AppNavigation(app: KonektaApp) {
                         )
                     }
 
-                    // Botão Sair integrado de forma limpa ao menu
                     NavigationBarItem(
                         icon = {
                             Icon(
@@ -273,14 +331,47 @@ fun AppNavigation(app: KonektaApp) {
                     )
                 }
 
+//                composable(Screen.Map.route) {
+//                    val mapViewModel: MapViewModel = viewModel(
+//                        factory = MapViewModel.Factory(app.jobRepository)
+//                    )
+//                    MapScreen(
+//                        viewModel = mapViewModel,
+////                        currentUserPhotoPath = ,
+//                        onOfferClick = { offerId ->
+////                            navController.navigate(Screen.JobDetail.createRoute(offerId))
+//                        }
+//                    )
+//                }
                 composable(Screen.Map.route) {
+
+                    val context = LocalContext.current
+
                     val mapViewModel: MapViewModel = viewModel(
-                        factory = MapViewModel.Factory(app.jobRepository)
+                        factory = MapViewModel.Factory(
+                            app.jobRepository
+                        )
                     )
+
                     MapScreen(
                         viewModel = mapViewModel,
+
                         onOfferClick = { offerId ->
-                            navController.navigate(Screen.JobDetail.createRoute(offerId))
+
+                            navController.navigate(
+                                Screen.JobDetail.createRoute(
+                                    offerId
+                                )
+                            )
+                        },
+
+                        onOfferRoute = { offer ->
+
+                            mapViewModel.calculateRoute(
+                                context = context,
+                                destinationLatitude = offer.latitude,
+                                destinationLongitude = offer.longitude
+                            )
                         }
                     )
                 }

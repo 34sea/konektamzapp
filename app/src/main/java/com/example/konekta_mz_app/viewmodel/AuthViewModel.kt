@@ -93,14 +93,23 @@ class AuthViewModel(
         latitude: Double = 0.0,
         longitude: Double = 0.0,
         companyName: String = "",
-        companyDescription: String = ""
+        companyDescription: String = "",
+        profileImagePath: String = ""
     ) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)
             val result = authRepository.register(
-                name, email, password, role, phone, location,
-                latitude, longitude, companyName, companyDescription
-            )
+                name = name,
+                email = email,
+                password = password,
+                role = role,
+                phone = phone,
+                location = location,
+                latitude = latitude,
+                longitude = longitude,
+                companyName = companyName,
+                companyDescription = companyDescription,
+                profileImagePath = profileImagePath)
             result.fold(
                 onSuccess = {
                     _state.value = _state.value.copy(

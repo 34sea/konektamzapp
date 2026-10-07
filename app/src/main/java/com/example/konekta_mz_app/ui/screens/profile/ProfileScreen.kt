@@ -262,7 +262,6 @@ fun ProfileScreen(
                             }
                         }
 
-                        // Badge com Ícone de Câmara
                         Box(
                             modifier = Modifier
                                 .size(36.dp)
@@ -282,7 +281,6 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Card de Identificação
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),

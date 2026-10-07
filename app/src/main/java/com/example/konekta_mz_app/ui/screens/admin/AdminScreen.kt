@@ -166,7 +166,6 @@ fun AdminScreen(
                 ) {
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Botoes de Ações de Gestão
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -187,7 +186,6 @@ fun AdminScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Cards Principais de Estatísticas
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -200,7 +198,7 @@ fun AdminScreen(
                             modifier = Modifier.weight(1f)
                         )
                         StatCard(
-                            label = "Ofertas",
+                            label = "Vagas",
                             value = state.totalOffers.toString(),
                             icon = Icons.Default.Work,
                             color = Color(0xFF2563EB),
@@ -210,7 +208,6 @@ fun AdminScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Card de Métricas do Gráfico de Candidaturas
                     val pendingApps = state.applications.count { it.status == ApplicationStatus.PENDING }
                     val acceptedApps = state.applications.count { it.status == ApplicationStatus.ACCEPTED }
                     val rejectedApps = state.applications.count { it.status == ApplicationStatus.REJECTED }
@@ -224,7 +221,6 @@ fun AdminScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Card de Proporção de Utilizadores
                     val candidateCount = state.users.count { it.role == UserRole.CANDIDATE }
                     val employerCount = state.users.count { it.role == UserRole.EMPLOYER }
 
@@ -237,7 +233,6 @@ fun AdminScreen(
                     Spacer(modifier = Modifier.height(20.dp))
                 }
 
-                // Separador de Abas (Ofertas vs Candidaturas)
                 TabRow(
                     selectedTabIndex = selectedTab,
                     containerColor = BackgroundLight,
@@ -254,7 +249,7 @@ fun AdminScreen(
                         onClick = { selectedTab = 0 },
                         text = {
                             Text(
-                                "Ofertas (${state.offers.size})",
+                                "Vagas (${state.offers.size})",
                                 fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Medium,
                                 color = if (selectedTab == 0) GreenPrimary else TextMuted
                             )
@@ -275,7 +270,6 @@ fun AdminScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Lista de Ofertas ou Candidaturas
                 Box(modifier = Modifier.weight(1f)) {
                     when (selectedTab) {
                         0 -> OffersTab(
@@ -404,7 +398,6 @@ private fun ApplicationsChartCard(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Gráfico de Barras em Canvas Customizado
             val maxValue = maxOf(totalApps, 1)
             Row(
                 modifier = Modifier

@@ -26,7 +26,8 @@ class AuthRepository(private val userDao: UserDao) {
         latitude: Double = 0.0,
         longitude: Double = 0.0,
         companyName: String = "",
-        companyDescription: String = ""
+        companyDescription: String = "",
+        profileImagePath: String = ""
     ): Result<Long> {
         val existingUser = userDao.getUserByEmail(email)
         if (existingUser != null) {
@@ -43,7 +44,8 @@ class AuthRepository(private val userDao: UserDao) {
             latitude = latitude,
             longitude = longitude,
             companyName = companyName,
-            companyDescription = companyDescription
+            companyDescription = companyDescription,
+            profileImagePath = profileImagePath
         )
         val id = userDao.insertUser(user)
         return Result.success(id)

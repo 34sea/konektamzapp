@@ -99,7 +99,7 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .imePadding() // <--- ADICIONADO AQUI: Adiciona o espaçamento do teclado dinamicamente
+                .imePadding()
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
@@ -116,7 +116,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Título Principal
             Text(
                 text = "Bem-vindo de volta",
                 fontSize = 24.sp,
@@ -126,7 +125,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Subtítulo
             Text(
                 text = "Entre para gerir o seu perfil e candidaturas",
                 fontSize = 14.sp,
@@ -136,7 +134,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Tab Selector (Entrar / Criar Conta)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -180,7 +177,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Seção de Formulário
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Entrar para continuar",
@@ -199,7 +195,6 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Campo de E-mail / Usuário
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
@@ -230,7 +225,6 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Campo de Senha
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
@@ -271,7 +265,6 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Botão de Entrar
                 Button(
                     onClick = { viewModel.login(email, password) },
                     enabled = !state.isLoading && email.isNotBlank() && password.isNotBlank(),
@@ -301,7 +294,6 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Link para Registo
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
@@ -319,7 +311,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Rodapé
             Text(
                 text = "Admin: admin@konekta.co.mz / admin123",
                 style = MaterialTheme.typography.labelMedium,

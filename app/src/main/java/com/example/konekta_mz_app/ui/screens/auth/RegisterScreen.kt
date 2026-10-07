@@ -153,7 +153,6 @@ fun RegisterScreen(
         }
     }
 
-    // Substituído Scaffold por Box para remover paddings/insets aninhados
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -169,7 +168,6 @@ fun RegisterScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Logo
             Text(
                 text = "Konekta",
                 fontSize = 28.sp,
@@ -179,7 +177,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Título
             Text(
                 text = "Crie a sua conta",
                 fontSize = 24.sp,
@@ -198,7 +195,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Tab Selector (Entrar / Criar Conta)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -242,7 +238,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Foto de Perfil
             Box(
                 modifier = Modifier
                     .size(96.dp)
@@ -285,7 +280,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Seletor de Perfil (Candidato vs Empregador)
             Text(
                 text = "Tipo de Perfil",
                 fontSize = 14.sp,
@@ -347,7 +341,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Campos do Formulário
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -515,7 +508,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Campo de Localização
             OutlinedTextField(
                 value = location,
                 onValueChange = { location = it },
@@ -560,7 +552,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Botão Principal
             Button(
                 onClick = {
                     if (name.isBlank() || email.isBlank() || phone.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
@@ -601,7 +592,8 @@ fun RegisterScreen(
                         latitude = latitude,
                         longitude = longitude,
                         companyName = companyName.trim(),
-                        companyDescription = companyDescription.trim()
+                        companyDescription = companyDescription.trim(),
+                        profileImagePath = profileImagePath
                     )
                 },
                 enabled = !state.isLoading,
@@ -632,7 +624,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Link para voltar
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -650,7 +641,6 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(32.dp))
         }
 
-        // Host das mensagens do Snackbar na parte inferior da tela
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier

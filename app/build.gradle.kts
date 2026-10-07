@@ -59,6 +59,7 @@ dependencies {
     // Room (SQLite)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.play.services.maps)
     ksp(libs.androidx.room.compiler)
 
     // OSMDroid (OpenStreetMap)

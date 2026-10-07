@@ -392,7 +392,7 @@ fun JobDetailScreen(
                         ) {
                             Icon(Icons.Default.Edit, contentDescription = null, tint = Color.White)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Editar Oferta", fontWeight = FontWeight.Bold, color = Color.White)
+                            Text("Editar", fontWeight = FontWeight.Bold, color = Color.White)
                         }
 
                         Spacer(modifier = Modifier.height(10.dp))
@@ -418,7 +418,7 @@ fun JobDetailScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                "Eliminar Oferta",
+                                "Eliminar",
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFFE53935)
                             )
@@ -428,7 +428,6 @@ fun JobDetailScreen(
                     Spacer(modifier = Modifier.height(24.dp))
                 }
 
-                // Diálogo de Candidatura com PDF e Teclado Ajustado
                 if (showApplyDialog) {
                     AlertDialog(
                         onDismissRequest = { showApplyDialog = false },

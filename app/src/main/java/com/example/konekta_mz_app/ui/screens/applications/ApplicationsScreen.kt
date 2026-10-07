@@ -233,7 +233,6 @@ private fun ApplicationCard(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Foto/Thumbnail da Vaga de Emprego
 //                Box(
 //                    modifier = Modifier
 //                        .size(56.dp)
@@ -316,7 +315,6 @@ private fun ApplicationCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Ações de Empregador / Ver Detalhes
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
