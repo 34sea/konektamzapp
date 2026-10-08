@@ -32,7 +32,6 @@ class AuthViewModel(
     val state: StateFlow<AuthState> = _state.asStateFlow()
 
     init {
-        // Check if user has an active session
         if (sessionManager.isLoggedIn()) {
             val userId = sessionManager.getUserId()
             if (userId > 0) {
@@ -44,7 +43,6 @@ class AuthViewModel(
                             currentUser = user
                         )
                     } else {
-                        // User not found in DB, clear session
                         sessionManager.clearSession()
                     }
                 }
@@ -58,7 +56,6 @@ class AuthViewModel(
             val result = authRepository.login(email, password)
             result.fold(
                 onSuccess = { user ->
-                    // Save session
                     sessionManager.saveSession(
                         userId = user.id,
                         name = user.name,
@@ -144,7 +141,6 @@ class AuthViewModel(
         viewModelScope.launch {
             authRepository.updateUser(user)
             _state.value = _state.value.copy(currentUser = user)
-            // Update session with new data
             sessionManager.saveSession(
                 userId = user.id,
                 name = user.name,

@@ -238,12 +238,6 @@ data class MapState(
 
     val zoomLevel: Double = 19.0,
 
-    /*
-     * ============================
-     * ROTA
-     * ============================
-     */
-
     val route: List<LatLng> = emptyList(),
 
     val routeDistanceMeters: Double = 0.0,
@@ -256,13 +250,6 @@ data class MapState(
 
 class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
 
-
-    /*
-     * ============================
-     * STATE
-     * ============================
-     */
-
     private val _state =
         MutableStateFlow(
             MapState()
@@ -272,22 +259,10 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
         _state.asStateFlow()
 
 
-    /*
-     * ============================
-     * INIT
-     * ============================
-     */
-
     init {
         loadOffers()
     }
 
-
-    /*
-     * ============================
-     * OFERTAS
-     * ============================
-     */
 
     private fun loadOffers() {
 
@@ -328,12 +303,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
     }
 
 
-    /*
-     * ============================
-     * SELECIONAR OFERTA
-     * ============================
-     */
-
     fun selectOffer(
         offer: JobOffer
     ) {
@@ -343,13 +312,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                 selectedOffer = offer
             )
     }
-
-
-    /*
-     * ============================
-     * LOCALIZAÇÃO DO UTILIZADOR
-     * ============================
-     */
 
     fun updateLocation(
         latitude: Double,
@@ -363,22 +325,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
             )
     }
 
-
-    /*
-     * ============================
-     * CALCULAR ROTA
-     * ============================
-     *
-     * Recebe:
-     *
-     * - Context para ler o GeoJSON
-     * - Latitude do destino
-     * - Longitude do destino
-     *
-     * O ponto inicial é automaticamente
-     * a localização atual do utilizador.
-     */
-
     fun calculateRoute(
         context: Context,
         destinationLatitude: Double,
@@ -387,10 +333,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
 
         val currentState =
             _state.value
-
-        /*
-         * Verifica se temos localização válida.
-         */
 
         if (
             currentState.userLatitude == 0.0 ||
@@ -424,11 +366,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
 
             try {
-
-                /*
-                 * Estado de carregamento.
-                 */
-
                 withContext(Dispatchers.Main) {
 
                     _state.value =
@@ -439,13 +376,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                             routeDistanceMeters = 0.0
                         )
                 }
-
-
-                /*
-                 * ============================
-                 * LER GEOJSON
-                 * ============================
-                 */
 
                 val geojsonStr =
                     context.assets
@@ -466,13 +396,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                     data.getJSONArray(
                         "features"
                     )
-
-
-                /*
-                 * ============================
-                 * LER ROTAS DO GEOJSON
-                 * ============================
-                 */
 
                 val parsedRoutes =
                     mutableListOf<List<LatLng>>()
@@ -514,16 +437,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                                 .getJSONArray(j)
 
 
-                        /*
-                         * GeoJSON:
-                         *
-                         * [longitude, latitude]
-                         *
-                         * LatLng:
-                         *
-                         * latitude, longitude
-                         */
-
                         val longitude =
                             point.getDouble(0)
 
@@ -549,13 +462,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                         )
                     }
                 }
-
-
-                /*
-                 * ============================
-                 * CONSTRUIR GRAFO
-                 * ============================
-                 */
 
                 val graph =
                     mutableMapOf<
@@ -595,10 +501,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                 }
 
 
-                /*
-                 * Nenhuma estrada encontrada.
-                 */
-
                 if (graph.isEmpty()) {
 
                     withContext(Dispatchers.Main) {
@@ -615,12 +517,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                 }
 
 
-                /*
-                 * ============================
-                 * ENCONTRAR NÓ MAIS PRÓXIMO
-                 * ============================
-                 */
-
                 val startNode =
                     noMaisProximo(
                         alvo = start,
@@ -634,71 +530,12 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                         nos = graph.keys
                     )
 
-
-                /*
-                 * ============================
-                 * A*
-                 * ============================
-                 */
-
-//                val calculatedRoute =
-//                    buscarRotaAStar(
-//                        graph = graph,
-//                        start = startNode,
-//                        goal = destinationNode
-//                    )
-//
-//
-//                /*
-//                 * Nenhuma rota encontrada.
-//                 */
-//
-//                if (
-//                    calculatedRoute.isEmpty()
-//                ) {
-//
-//                    withContext(Dispatchers.Main) {
-//
-//                        _state.value =
-//                            _state.value.copy(
-//                                isRouteLoading = false,
-//                                routeError =
-//                                "Não foi possível encontrar uma rota."
-//                            )
-//                    }
-//
-//                    return@launch
-//                }
-//
-//
-//                /*
-//                 * ============================
-//                 * DISTÂNCIA
-//                 * ============================
-//                 */
-//
-//                val distance =
-//                    calcularDistanciaRota(
-//                        calculatedRoute
-//                    )
-
-                /*
- * ============================
- * A*
- * ============================
- */
-
                 val calculatedRoute =
                     buscarRotaAStar(
                         graph = graph,
                         start = startNode,
                         goal = destinationNode
                     )
-
-
-                /*
-                 * Nenhuma rota encontrada.
-                 */
 
                 if (calculatedRoute.isEmpty()) {
 
@@ -715,43 +552,10 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                     return@launch
                 }
 
-
-                /*
-                 * ============================
-                 * ROTA FINAL
-                 * ============================
-                 *
-                 * A rota do A* começa no nó da estrada
-                 * mais próximo do GPS e termina no nó
-                 * mais próximo do serviço.
-                 *
-                 * Aqui adicionamos:
-                 *
-                 * GPS
-                 *   ↓
-                 * startNode
-                 *   ↓
-                 * rota A*
-                 *   ↓
-                 * destinationNode
-                 *   ↓
-                 * marcador exato do serviço
-                 */
-
                 val finalRoute =
                     buildList {
-
-                        /*
-                         * Posição GPS exata.
-                         */
                         add(start)
 
-                        /*
-                         * Rota calculada pelo A*.
-                         *
-                         * Evitamos duplicar o startNode caso
-                         * ele já seja o primeiro ponto.
-                         */
                         calculatedRoute.forEach { point ->
 
                             if (lastOrNull() != point) {
@@ -759,33 +563,15 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                             }
                         }
 
-                        /*
-                         * Marcador exato do serviço.
-                         */
                         if (lastOrNull() != destination) {
                             add(destination)
                         }
                     }
 
-
-                /*
-                 * ============================
-                 * DISTÂNCIA
-                 * ============================
-                 */
-
                 val distance =
                     calcularDistanciaRota(
                         finalRoute
                     )
-
-
-                /*
-                 * ============================
-                 * ATUALIZAR STATE
-                 * ============================
-                 */
-
                 withContext(Dispatchers.Main) {
 
                     _state.value =
@@ -854,13 +640,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
         }
     }
 
-
-    /*
-     * ============================
-     * NÓ MAIS PRÓXIMO
-     * ============================
-     */
-
     private fun noMaisProximo(
         alvo: LatLng,
         nos: Collection<LatLng>
@@ -898,13 +677,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
         return maisProximo
     }
 
-
-    /*
-     * ============================
-     * A*
-     * ============================
-     */
-
     private fun buscarRotaAStar(
         graph: Map<LatLng, List<LatLng>>,
         start: LatLng,
@@ -940,11 +712,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                     Double
                     >()
 
-
-        /*
-         * Inicializar scores.
-         */
-
         for (
         node in graph.keys
         ) {
@@ -955,11 +722,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
             fScore[node] =
                 Double.POSITIVE_INFINITY
         }
-
-
-        /*
-         * Ponto inicial.
-         */
 
         gScore[start] =
             0.0
@@ -984,12 +746,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
             mutableSetOf<LatLng>()
 
 
-        /*
-         * ============================
-         * LOOP A*
-         * ============================
-         */
-
         while (
             openSet.isNotEmpty()
         ) {
@@ -999,10 +755,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                     .poll()
                     .point
 
-
-            /*
-             * Chegamos ao destino.
-             */
 
             if (
                 current == goal
@@ -1014,11 +766,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                 )
             }
 
-
-            /*
-             * Evita processar o mesmo nó
-             * repetidamente.
-             */
 
             if (
                 !visited.add(current)
@@ -1037,12 +784,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
             neighbor in neighbors
             ) {
 
-
-                /*
-                 * Distância do nó atual
-                 * até ao vizinho.
-                 */
-
                 val movementCost =
                     distance(
                         current,
@@ -1057,11 +798,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                             ) +
                             movementCost
 
-
-                /*
-                 * Verifica se encontramos
-                 * um caminho melhor.
-                 */
 
                 if (
                     tentativeGScore <
@@ -1079,12 +815,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
                         tentativeGScore
 
 
-                    /*
-                     * Heurística:
-                     *
-                     * distância do vizinho
-                     * até ao destino.
-                     */
 
                     val heuristic =
                         distance(
@@ -1112,20 +842,8 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
             }
         }
 
-
-        /*
-         * Nenhum caminho encontrado.
-         */
-
         return emptyList()
     }
-
-
-    /*
-     * ============================
-     * RECONSTRUIR CAMINHO
-     * ============================
-     */
 
     private fun reconstruirCaminho(
         cameFrom: Map<LatLng, LatLng?>,
@@ -1160,14 +878,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
         return path
     }
 
-
-    /*
-     * ============================
-     * DISTÂNCIA ENTRE DOIS PONTOS
-     * ============================
-     *
-     * Retorna metros.
-     */
 
     private fun distance(
         a: LatLng,
@@ -1225,12 +935,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
     }
 
 
-    /*
-     * ============================
-     * DISTÂNCIA TOTAL DA ROTA
-     * ============================
-     */
-
     private fun calcularDistanciaRota(
         route: List<LatLng>
     ): Double {
@@ -1262,12 +966,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
     }
 
 
-    /*
-     * ============================
-     * LIMPAR ROTA
-     * ============================
-     */
-
     fun clearRoute() {
         Log.d("Start clear", "Yes")
         _state.value =
@@ -1285,12 +983,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
     }
 
 
-    /*
-     * ============================
-     * NODE DO A*
-     * ============================
-     */
-
     private data class Node(
 
         val point: LatLng,
@@ -1298,12 +990,6 @@ class MapViewModel(private val jobRepository: JobRepository) : ViewModel() {
         val fScore: Double
     )
 
-
-    /*
-     * ============================
-     * FACTORY
-     * ============================
-     */
 
     class Factory(
         private val jobRepository: JobRepository
